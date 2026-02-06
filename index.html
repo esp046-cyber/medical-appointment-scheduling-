@@ -1,0 +1,2518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0066CC">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>MediSchedule AI - Doctor Appointments 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #0066CC;
+            --primary-dark: #0052A3;
+            --secondary: #00C9A7;
+            --background: #F8FAFB;
+            --surface: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #5F6368;
+            --border: #E0E4E8;
+            --error: #DC3545;
+            --success: #00C9A7;
+            --warning: #FFA726;
+            --ai-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Dark Mode Variables */
+        [data-theme="dark"] {
+            --primary: #4A9EFF;
+            --primary-dark: #3A8EEF;
+            --secondary: #00E6C3;
+            --background: #121212;
+            --surface: #1E1E1E;
+            --text-primary: #E8E8E8;
+            --text-secondary: #B0B0B0;
+            --border: #333333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            margin: 1%;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--surface);
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 12px 1%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,102,204,0.15);
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .ai-badge {
+            background: var(--ai-gradient);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.95);
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+            margin: 1% 0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 38px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-primary);
+            background: var(--surface);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Settings Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 16px 16px 0 0;
+            max-width: 480px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUpModal 0.3s;
+        }
+
+        @keyframes slideUpModal {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            z-index: 1;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:active {
+            background: var(--background);
+        }
+
+        .modal-body {
+            padding: 16px;
+        }
+
+        .setting-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .setting-description {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.active::after {
+            left: 22px;
+        }
+
+        /* Export/Print Styles */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin: 1% 0;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            flex: 1;
+        }
+
+        .btn-outline:active {
+            background: rgba(0,102,204,0.1);
+        }
+
+        /* Print Styles */
+        @media print {
+            .header, .nav-tabs, .bottom-nav, .btn, .ai-assistant, 
+            .action-buttons, .modal-overlay {
+                display: none !important;
+            }
+
+            .app-container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            .card {
+                page-break-inside: avoid;
+                border: 1px solid #000;
+            }
+
+            body {
+                background: white;
+            }
+
+            .appointment-card {
+                border-left-color: #000;
+            }
+        }
+
+        /* Conflict Warning */
+        .conflict-warning {
+            background: #FFF4E5;
+            border: 1px solid var(--warning);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 1% 0;
+            font-size: 12px;
+            color: #CC7A00;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        /* Payment Status Badge */
+        .payment-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+
+        .payment-paid {
+            background: #E7F5F0;
+            color: #00875A;
+        }
+
+        .payment-unpaid {
+            background: #FFE5E5;
+            color: #DC3545;
+        }
+
+        .payment-partial {
+            background: #FFF4E5;
+            color: #FF8B00;
+        }
+
+        /* Recurring Appointment Icon */
+        .recurring-icon {
+            display: inline-block;
+            margin-left: 6px;
+            font-size: 12px;
+            color: var(--primary);
+        }
+
+        /* Patient Profile Card */
+        .profile-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 1% 0;
+            border: 1px solid var(--border);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .profile-avatar-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .profile-info-header {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .profile-detail {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .profile-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .profile-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .profile-field {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 12px;
+        }
+
+        .profile-label {
+            color: var(--text-secondary);
+        }
+
+        .profile-value {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Block Time Slot */
+        .blocked-slot {
+            background: #FFE5E5;
+            border: 1.5px solid var(--error);
+            color: var(--error);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Drag and Drop */
+        .draggable {
+            cursor: move;
+            transition: all 0.2s;
+        }
+
+        .draggable:active {
+            opacity: 0.7;
+            transform: scale(0.98);
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--primary);
+            background: rgba(0,102,204,0.05);
+            min-height: 60px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1% 0;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* QR Code Container */
+        .qr-container {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin: 1% 0;
+            border: 1px solid var(--border);
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 12px auto;
+            background: white;
+            border: 4px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+        }
+
+        /* Login/Password Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .login-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 32px 24px;
+            max-width: 320px;
+            width: 90%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .login-title {
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .login-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .pin-input-container {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .pin-digit {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 24px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .pin-digit:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        /* Template Selector */
+        .template-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .template-item {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-item:hover {
+            border-color: var(--primary);
+            background: rgba(0,102,204,0.05);
+        }
+
+        .template-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .template-preview {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* PDF Export Button */
+        .btn-pdf {
+            background: linear-gradient(135deg, #DC3545 0%, #C82333 100%);
+            color: white;
+        }
+
+        /* Recurring Options */
+        .recurring-options {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: var(--background);
+            border-radius: 8px;
+        }
+
+        .recurring-options.active {
+            display: block;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 44px;
+            z-index: 99;
+            margin: 0 1%;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Content Sections */
+        .tab-content {
+            display: none;
+            padding: 1%;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* AI Assistant Card */
+        .ai-assistant {
+            background: var(--ai-gradient);
+            border-radius: 12px;
+            padding: 14px;
+            margin: 1% 0;
+            color: white;
+        }
+
+        .ai-assistant h3 {
+            font-size: 14px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ai-assistant p {
+            font-size: 12px;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+
+        .ai-suggestion {
+            background: rgba(255,255,255,0.15);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 14px;
+            margin: 1% 0;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Appointment Card */
+        .appointment-card {
+            border-left: 4px solid var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .appointment-time {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .appointment-patient {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .appointment-type {
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-confirmed {
+            background: #E7F5F0;
+            color: #00875A;
+        }
+
+        .status-pending {
+            background: #FFF4E5;
+            color: #FF8B00;
+        }
+
+        .status-ai {
+            background: #F3E8FF;
+            color: #7C3AED;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-primary);
+            background: var(--surface);
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:active {
+            background: var(--primary-dark);
+            transform: scale(0.98);
+        }
+
+        .btn-ai {
+            background: var(--ai-gradient);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background: var(--background);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 1% 0;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Calendar */
+        .calendar-container {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            margin: 1% 0;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .calendar-month {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--primary);
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 4px;
+        }
+
+        .calendar-date {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calendar-date:hover {
+            background: var(--background);
+        }
+
+        .calendar-date.today {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-date.has-appointments {
+            position: relative;
+        }
+
+        .calendar-date.has-appointments::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 2px;
+        }
+
+        /* Time Slots */
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 1% 0;
+        }
+
+        .time-slot {
+            padding: 10px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-slot:hover {
+            border-color: var(--primary);
+            background: rgba(0,102,204,0.05);
+        }
+
+        .time-slot.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .time-slot.booked {
+            background: var(--background);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* AI Recommendations */
+        .ai-recommendations {
+            background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+            border-radius: 12px;
+            padding: 14px;
+            margin: 1% 0;
+        }
+
+        .recommendation-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .recommendation-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--ai-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Patient List */
+        .patient-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .patient-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .patient-info {
+            flex: 1;
+        }
+
+        .patient-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .patient-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 1%;
+            z-index: 100;
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 10px;
+            transition: all 0.2s;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary);
+        }
+
+        .bottom-nav-icon {
+            font-size: 20px;
+        }
+
+        /* Responsive */
+        @media (min-width: 481px) {
+            body { margin: 2%; }
+            .header { padding: 16px 2%; }
+            .nav-tabs { margin: 0 2%; }
+            .tab-content { padding: 2%; }
+            .bottom-nav { padding: 12px 2%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                📅 MediSchedule <span class="ai-badge">AI</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌙</button>
+                <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('schedule')">Schedule</button>
+            <button class="nav-tab" onclick="switchTab('book')">Book</button>
+            <button class="nav-tab" onclick="switchTab('patients')">Patients</button>
+            <button class="nav-tab" onclick="switchTab('analytics')">Analytics</button>
+        </div>
+
+        <!-- Schedule Tab -->
+        <div id="schedule" class="tab-content active">
+            <!-- AI Assistant -->
+            <div class="ai-assistant">
+                <h3>🤖 AI Assistant Active</h3>
+                <p>Smart scheduling optimized for your practice patterns</p>
+                <div class="ai-suggestion">
+                    💡 Suggestion: You have 3 back-to-back appointments this afternoon. Consider adding a 15-min buffer after 2:30 PM.
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-outline" onclick="exportSchedule()">
+                    📤 Export
+                </button>
+                <button class="btn btn-outline" onclick="printSchedule()">
+                    🖨️ Print
+                </button>
+            </div>
+
+            <!-- Conflict Detection -->
+            <div class="conflict-warning" id="conflictWarning" style="display: none;">
+                ⚠️ AI detected potential scheduling conflict at 2:30 PM
+            </div>
+
+            <!-- Today's Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Today's Appointments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Pending Confirmations</div>
+                </div>
+            </div>
+
+            <!-- Upcoming Appointments -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Today's Schedule - Feb 6, 2026</div>
+                    <span class="status-badge status-ai">AI Optimized</span>
+                </div>
+
+                <div class="appointment-card card draggable" draggable="true">
+                    <div class="appointment-time">9:00 AM</div>
+                    <div class="appointment-patient">Sarah Johnson <span class="recurring-icon" title="Recurring">🔄</span></div>
+                    <div class="appointment-type">🩺 General Checkup • 30 min</div>
+                    <span class="status-badge status-confirmed">Confirmed</span>
+                    <span class="payment-badge payment-paid">Paid $150</span>
+                </div>
+
+                <div class="appointment-card card draggable" draggable="true">
+                    <div class="appointment-time">10:00 AM</div>
+                    <div class="appointment-patient">Michael Chen</div>
+                    <div class="appointment-type">💉 Follow-up Visit • 20 min</div>
+                    <span class="status-badge status-confirmed">Confirmed</span>
+                    <span class="payment-badge payment-unpaid">Unpaid $100</span>
+                </div>
+
+                <div class="appointment-card card draggable" draggable="true">
+                    <div class="appointment-time">11:30 AM</div>
+                    <div class="appointment-patient">Emma Williams</div>
+                    <div class="appointment-type">🔬 Lab Results Review • 15 min</div>
+                    <span class="status-badge status-pending">Pending</span>
+                    <span class="payment-badge payment-partial">Partial $75/$100</span>
+                </div>
+
+                <div class="appointment-card card draggable" draggable="true">
+                    <div class="appointment-time">2:00 PM</div>
+                    <div class="appointment-patient">David Martinez <span class="recurring-icon" title="Recurring Monthly">🔄</span></div>
+                    <div class="appointment-type">🩺 Annual Physical • 45 min</div>
+                    <span class="status-badge status-ai">AI Scheduled</span>
+                    <span class="payment-badge payment-paid">Paid $250</span>
+                </div>
+            </div>
+
+            <!-- AI Recommendations -->
+            <div class="ai-recommendations">
+                <div class="card-title" style="margin-bottom: 10px;">🎯 AI Recommendations</div>
+                
+                <div class="recommendation-item">
+                    <div class="recommendation-icon">1</div>
+                    <div>
+                        <strong>Optimize afternoon slot</strong><br>
+                        <span style="color: var(--text-secondary);">Move 3:00 PM appointment to 2:45 PM for better flow</span>
+                    </div>
+                </div>
+
+                <div class="recommendation-item">
+                    <div class="recommendation-icon">2</div>
+                    <div>
+                        <strong>Patient reminder sent</strong><br>
+                        <span style="color: var(--text-secondary);">Auto-confirmed with Emma Williams for 11:30 AM</span>
+                    </div>
+                </div>
+
+                <div class="recommendation-item">
+                    <div class="recommendation-icon">3</div>
+                    <div>
+                        <strong>Buffer time added</strong><br>
+                        <span style="color: var(--text-secondary);">15-min break scheduled at 12:30 PM for lunch</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Appointment Tab -->
+        <div id="book" class="tab-content">
+            <div class="ai-assistant">
+                <h3>🤖 Smart Booking</h3>
+                <p>AI suggests optimal time slots based on appointment type and patient history</p>
+            </div>
+
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label class="form-label">Patient Name</label>
+                    <input type="text" class="form-input" placeholder="Enter patient name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contact Number</label>
+                    <input type="tel" class="form-input" placeholder="+1 (555) 000-0000" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Appointment Type</label>
+                    <select class="form-select" required onchange="updateTimeSlots()">
+                        <option value="">Select type</option>
+                        <option value="checkup">General Checkup (30 min) - $150</option>
+                        <option value="followup">Follow-up Visit (20 min) - $100</option>
+                        <option value="physical">Annual Physical (45 min) - $250</option>
+                        <option value="consultation">Consultation (60 min) - $200</option>
+                        <option value="emergency">Urgent Care (15 min) - $75</option>
+                    </select>
+                </div>
+
+                <!-- Recurring Appointment -->
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="recurringCheck" onchange="toggleRecurring()">
+                        <span>🔄 Make this a recurring appointment</span>
+                    </label>
+                    <div class="recurring-options" id="recurringOptions">
+                        <label class="form-label">Repeat Every:</label>
+                        <select class="form-select">
+                            <option value="weekly">Week</option>
+                            <option value="biweekly">2 Weeks</option>
+                            <option value="monthly">Month</option>
+                            <option value="quarterly">3 Months</option>
+                        </select>
+                        <label class="form-label" style="margin-top: 10px;">Number of Occurrences:</label>
+                        <input type="number" class="form-input" value="4" min="2" max="52">
+                    </div>
+                </div>
+
+                <!-- Calendar -->
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button type="button" class="calendar-nav" onclick="changeMonth(-1)">◀</button>
+                        <div class="calendar-month" id="currentMonth">February 2026</div>
+                        <button type="button" class="calendar-nav" onclick="changeMonth(1)">▶</button>
+                    </div>
+
+                    <div class="calendar-days">
+                        <div class="calendar-day-header">Su</div>
+                        <div class="calendar-day-header">Mo</div>
+                        <div class="calendar-day-header">Tu</div>
+                        <div class="calendar-day-header">We</div>
+                        <div class="calendar-day-header">Th</div>
+                        <div class="calendar-day-header">Fr</div>
+                        <div class="calendar-day-header">Sa</div>
+                    </div>
+
+                    <div class="calendar-days" id="calendarDates">
+                        <!-- Generated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Available Time Slots <span class="status-badge status-ai">AI Suggested</span></label>
+                    <button type="button" class="btn btn-secondary btn-small" style="margin-bottom: 8px;" onclick="blockTimeSlot()">🚫 Block Time Slot</button>
+                    <div class="time-slots" id="timeSlots">
+                        <div class="time-slot">9:00 AM</div>
+                        <div class="time-slot">10:00 AM</div>
+                        <div class="time-slot booked">11:00 AM</div>
+                        <div class="time-slot">11:30 AM</div>
+                        <div class="time-slot blocked-slot" title="Blocked - Lunch Break">12:30 PM</div>
+                        <div class="time-slot">1:00 PM</div>
+                        <div class="time-slot">2:00 PM</div>
+                        <div class="time-slot">3:00 PM</div>
+                        <div class="time-slot">4:00 PM</div>
+                        <div class="time-slot">4:30 PM</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Additional Notes (Optional)</label>
+                    <textarea class="form-textarea" placeholder="Any special requirements or symptoms..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-ai">
+                    🤖 Book with AI Optimization
+                </button>
+            </form>
+        </div>
+
+        <!-- Patients Tab -->
+        <div id="patients" class="tab-content">
+            <!-- Search Box -->
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search patients..." id="patientSearch" oninput="searchPatients()">
+            </div>
+
+            <!-- Patient Profile (Hidden by default) -->
+            <div class="profile-card" id="patientProfile" style="display: none;">
+                <div class="profile-header">
+                    <div class="profile-avatar-large" id="profileAvatar">SJ</div>
+                    <div class="profile-info-header">
+                        <div class="profile-name" id="profileName">Sarah Johnson</div>
+                        <div class="profile-detail" id="profileContact">📞 (555) 123-4567</div>
+                        <div class="profile-detail" id="profileEmail">📧 sarah.j@email.com</div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="profile-section-title">📋 Basic Information</div>
+                    <div class="profile-field">
+                        <span class="profile-label">Date of Birth:</span>
+                        <span class="profile-value">March 15, 1985 (40 years)</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Blood Type:</span>
+                        <span class="profile-value">O+</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Allergies:</span>
+                        <span class="profile-value">Penicillin</span>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="profile-section-title">💳 Payment Information</div>
+                    <div class="profile-field">
+                        <span class="profile-label">Total Visits:</span>
+                        <span class="profile-value">3 appointments</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Total Paid:</span>
+                        <span class="profile-value" style="color: var(--success);">$450</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Outstanding:</span>
+                        <span class="profile-value" style="color: var(--error);">$0</span>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="profile-section-title">📅 Recent Appointments</div>
+                    <div class="profile-field">
+                        <span class="profile-label">Last Visit:</span>
+                        <span class="profile-value">Feb 6, 2026</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Next Appointment:</span>
+                        <span class="profile-value">Mar 6, 2026 (Recurring)</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="closePatientProfile()">← Back to List</button>
+            </div>
+
+            <div class="card" id="patientListCard">
+                <div class="card-header">
+                    <div class="card-title">Recent Patients</div>
+                    <button class="btn btn-secondary btn-small">+ Add New</button>
+                </div>
+
+                <div id="patientList">
+                    <div class="patient-item" data-name="sarah johnson" onclick="viewPatientProfile('Sarah Johnson', 'SJ', 'var(--primary)')">
+                        <div class="patient-avatar">SJ</div>
+                        <div class="patient-info">
+                            <div class="patient-name">Sarah Johnson</div>
+                            <div class="patient-meta">Last visit: Feb 6, 2026 • 3 appointments • <span style="color: var(--success);">Paid</span></div>
+                        </div>
+                    </div>
+
+                    <div class="patient-item" data-name="michael chen" onclick="viewPatientProfile('Michael Chen', 'MC', 'var(--secondary)')">
+                        <div class="patient-avatar" style="background: var(--secondary);">MC</div>
+                        <div class="patient-info">
+                            <div class="patient-name">Michael Chen</div>
+                            <div class="patient-meta">Last visit: Feb 5, 2026 • 7 appointments • <span style="color: var(--error);">$100 Due</span></div>
+                        </div>
+                    </div>
+
+                    <div class="patient-item" data-name="emma williams" onclick="viewPatientProfile('Emma Williams', 'EW', 'var(--warning)')">
+                        <div class="patient-avatar" style="background: var(--warning);">EW</div>
+                        <div class="patient-info">
+                            <div class="patient-name">Emma Williams</div>
+                            <div class="patient-meta">Last visit: Jan 28, 2026 • 2 appointments • <span style="color: var(--warning);">Partial Paid</span></div>
+                        </div>
+                    </div>
+
+                    <div class="patient-item" data-name="david martinez" onclick="viewPatientProfile('David Martinez', 'DM', '#9C27B0')">
+                        <div class="patient-avatar" style="background: #9C27B0;">DM</div>
+                        <div class="patient-info">
+                            <div class="patient-name">David Martinez</div>
+                            <div class="patient-meta">Last visit: Jan 15, 2026 • 5 appointments • <span style="color: var(--success);">Paid</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="no-results" id="noResults" style="display: none;">
+                    <div class="no-results-icon">🔍</div>
+                    <div>No patients found</div>
+                </div>
+            </div>
+
+            <div class="ai-assistant">
+                <h3>🤖 Patient Insights</h3>
+                <p>AI detected 2 patients due for annual checkups this month</p>
+                <div class="ai-suggestion">
+                    📊 Pattern detected: 40% increase in flu-related visits this week. Consider extending appointment buffers.
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">247</div>
+                    <div class="stat-label">This Month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">94%</div>
+                    <div class="stat-label">Show-up Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">23min</div>
+                    <div class="stat-label">Avg Duration</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">4.8★</div>
+                    <div class="stat-label">Patient Rating</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Weekly Overview</div>
+                <div style="margin-top: 12px;">
+                    <canvas id="weeklyChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Appointment Types Distribution</div>
+                <div style="margin-top: 12px;">
+                    <div style="margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                            <span>General Checkup</span>
+                            <span style="font-weight: 600;">45%</span>
+                        </div>
+                        <div style="height: 8px; background: var(--background); border-radius: 4px;">
+                            <div style="width: 45%; height: 100%; background: var(--primary); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                            <span>Follow-up Visit</span>
+                            <span style="font-weight: 600;">30%</span>
+                        </div>
+                        <div style="height: 8px; background: var(--background); border-radius: 4px;">
+                            <div style="width: 30%; height: 100%; background: var(--secondary); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                            <span>Annual Physical</span>
+                            <span style="font-weight: 600;">25%</span>
+                        </div>
+                        <div style="height: 8px; background: var(--background); border-radius: 4px;">
+                            <div style="width: 25%; height: 100%; background: var(--warning); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-assistant">
+                <h3>🤖 AI Insights</h3>
+                <div class="ai-suggestion">
+                    📈 Your practice efficiency increased 12% this month with AI scheduling optimization
+                </div>
+                <div class="ai-suggestion">
+                    ⏰ Peak hours: 9-11 AM and 2-4 PM. Consider adding staff during these times.
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="#" class="bottom-nav-item active">
+                <div class="bottom-nav-icon">📅</div>
+                <div>Schedule</div>
+            </a>
+            <a href="#" class="bottom-nav-item">
+                <div class="bottom-nav-icon">➕</div>
+                <div>Book</div>
+            </a>
+            <a href="#" class="bottom-nav-item">
+                <div class="bottom-nav-icon">👥</div>
+                <div>Patients</div>
+            </a>
+            <a href="#" class="bottom-nav-item">
+                <div class="bottom-nav-icon">📊</div>
+                <div>Analytics</div>
+            </a>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal-overlay" id="settingsModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">⚙️ Settings</div>
+                    <button class="modal-close" onclick="closeSettings()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">🔐 Password Protection</div>
+                            <div class="setting-description">Require PIN to access app</div>
+                        </div>
+                        <div class="toggle-switch" onclick="togglePasswordProtection(this)" data-setting="passwordProtection"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">🔔 Appointment Reminders</div>
+                            <div class="setting-description">Send automatic SMS/Email reminders</div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSetting(this)" data-setting="reminders"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">📧 SMS/Email Templates</div>
+                            <div class="setting-description">Use customizable message templates</div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="openTemplates()">Manage</button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">📱 QR Code Check-in</div>
+                            <div class="setting-description">Generate QR code for patient check-in</div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="showQRCode()">View QR</button>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">🌐 Google Calendar Sync</div>
+                            <div class="setting-description">Two-way sync with Google Calendar</div>
+                        </div>
+                        <div class="toggle-switch" onclick="toggleSetting(this)" data-setting="googleSync"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">🤖 AI Auto-Scheduling</div>
+                            <div class="setting-description">Let AI optimize your schedule automatically</div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSetting(this)" data-setting="autoSchedule"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">⚠️ Conflict Detection</div>
+                            <div class="setting-description">Alert me about scheduling conflicts</div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSetting(this)" data-setting="conflictDetection"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">📧 Email Confirmations</div>
+                            <div class="setting-description">Auto-send booking confirmations</div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSetting(this)" data-setting="emailConfirm"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">🌙 Dark Mode</div>
+                            <div class="setting-description">Use dark theme</div>
+                        </div>
+                        <div class="toggle-switch" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">💾 Offline Mode</div>
+                            <div class="setting-description">Save data locally for offline access</div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSetting(this)" data-setting="offline"></div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">🔄 Auto-Sync</div>
+                            <div class="setting-description">Sync data across devices</div>
+                        </div>
+                        <div class="toggle-switch active" onclick="toggleSetting(this)" data-setting="autoSync"></div>
+                    </div>
+
+                    <button class="btn btn-primary" style="margin-top: 20px;" onclick="closeSettings()">
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- QR Code Modal -->
+        <div class="modal-overlay" id="qrModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">📱 QR Code Check-in</div>
+                    <button class="modal-close" onclick="closeQRCode()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="qr-container">
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">Patient Check-in QR Code</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+                            Scan this code to check in for your appointment
+                        </div>
+                        <div class="qr-code">
+                            📱
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 16px;">
+                            Clinic ID: MED-2026-SC01<br>
+                            Valid for: Today's appointments
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 16px; width: 100%;" onclick="downloadQRCode()">
+                            📥 Download QR Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SMS/Email Templates Modal -->
+        <div class="modal-overlay" id="templatesModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">📧 Message Templates</div>
+                    <button class="modal-close" onclick="closeTemplates()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom: 16px;">
+                        <button class="btn btn-primary" style="width: 100%;">+ Create New Template</button>
+                    </div>
+                    
+                    <div class="template-list">
+                        <div class="template-item">
+                            <div class="template-name">📅 Appointment Reminder (24hr)</div>
+                            <div class="template-preview">
+                                "Hi {name}, reminder: You have an appointment tomorrow at {time} with Dr. {doctor}. Reply C to confirm."
+                            </div>
+                        </div>
+
+                        <div class="template-item">
+                            <div class="template-name">⏰ Appointment Reminder (1hr)</div>
+                            <div class="template-preview">
+                                "Hi {name}, your appointment is in 1 hour at {time}. See you soon!"
+                            </div>
+                        </div>
+
+                        <div class="template-item">
+                            <div class="template-name">✅ Booking Confirmation</div>
+                            <div class="template-preview">
+                                "Appointment confirmed! {name}, your {type} appointment is scheduled for {date} at {time}."
+                            </div>
+                        </div>
+
+                        <div class="template-item">
+                            <div class="template-name">📋 Follow-up Request</div>
+                            <div class="template-preview">
+                                "Hi {name}, it's been {days} days since your last visit. Would you like to schedule a follow-up?"
+                            </div>
+                        </div>
+
+                        <div class="template-item">
+                            <div class="template-name">💳 Payment Reminder</div>
+                            <div class="template-preview">
+                                "Hi {name}, you have an outstanding balance of ${amount}. Please contact us to arrange payment."
+                            </div>
+                        </div>
+
+                        <div class="template-item">
+                            <div class="template-name">🔄 Recurring Appointment</div>
+                            <div class="template-preview">
+                                "Hi {name}, your next recurring appointment is scheduled for {date} at {time}."
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Password Login Screen -->
+        <div class="login-screen" id="loginScreen" style="display: none;">
+            <div class="login-card">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 48px;">🔐</div>
+                </div>
+                <div class="login-title">MediSchedule AI</div>
+                <div class="login-subtitle">Enter your 4-digit PIN to continue</div>
+                
+                <div class="pin-input-container">
+                    <input type="password" maxlength="1" class="pin-digit" id="pin1" oninput="movePinFocus(1)" onkeydown="handlePinBackspace(event, 1)">
+                    <input type="password" maxlength="1" class="pin-digit" id="pin2" oninput="movePinFocus(2)" onkeydown="handlePinBackspace(event, 2)">
+                    <input type="password" maxlength="1" class="pin-digit" id="pin3" oninput="movePinFocus(3)" onkeydown="handlePinBackspace(event, 3)">
+                    <input type="password" maxlength="1" class="pin-digit" id="pin4" oninput="movePinFocus(4)" onkeydown="handlePinBackspace(event, 4)">
+                </div>
+
+                <div id="pinError" style="color: var(--error); text-align: center; font-size: 12px; margin-bottom: 12px; display: none;">
+                    ❌ Incorrect PIN. Try again.
+                </div>
+
+                <div style="font-size: 11px; color: var(--text-secondary); text-align: center;">
+                    Default PIN: 1234<br>
+                    (Change in Settings after login)
+                </div>
+            </div>
+        </div>
+
+    <script>
+        // ==================== LOCAL STORAGE & DATA PERSISTENCE ====================
+        const AppData = {
+            appointments: [],
+            patients: [],
+            settings: {
+                reminders: true,
+                autoSchedule: true,
+                conflictDetection: true,
+                emailConfirm: true,
+                darkMode: false,
+                offline: true,
+                autoSync: true,
+                passwordProtection: false,
+                googleSync: false
+            },
+            pin: '1234', // Default PIN
+
+            save() {
+                localStorage.setItem('mediScheduleData', JSON.stringify({
+                    appointments: this.appointments,
+                    patients: this.patients,
+                    settings: this.settings,
+                    pin: this.pin,
+                    lastSync: new Date().toISOString()
+                }));
+            },
+
+            load() {
+                const data = localStorage.getItem('mediScheduleData');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    this.appointments = parsed.appointments || [];
+                    this.patients = parsed.patients || [];
+                    this.settings = parsed.settings || this.settings;
+                    this.pin = parsed.pin || '1234';
+                    return true;
+                }
+                return false;
+            },
+
+            init() {
+                this.load();
+                // Apply dark mode if saved
+                if (this.settings.darkMode) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    const toggle = document.getElementById('darkModeToggle');
+                    if (toggle) toggle.classList.add('active');
+                }
+                // Show login if password protection enabled
+                if (this.settings.passwordProtection) {
+                    showLoginScreen();
+                }
+            }
+        };
+
+        // ==================== PASSWORD PROTECTION ====================
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('pin1').focus();
+            }, 100);
+        }
+
+        function movePinFocus(position) {
+            const currentPin = document.getElementById(`pin${position}`);
+            if (currentPin.value.length === 1 && position < 4) {
+                document.getElementById(`pin${position + 1}`).focus();
+            }
+            
+            // Check if all 4 digits entered
+            if (position === 4 && currentPin.value.length === 1) {
+                checkPin();
+            }
+        }
+
+        function handlePinBackspace(event, position) {
+            if (event.key === 'Backspace' && position > 1) {
+                const currentPin = document.getElementById(`pin${position}`);
+                if (currentPin.value.length === 0) {
+                    document.getElementById(`pin${position - 1}`).focus();
+                }
+            }
+        }
+
+        function checkPin() {
+            const pin1 = document.getElementById('pin1').value;
+            const pin2 = document.getElementById('pin2').value;
+            const pin3 = document.getElementById('pin3').value;
+            const pin4 = document.getElementById('pin4').value;
+            const enteredPin = pin1 + pin2 + pin3 + pin4;
+
+            if (enteredPin === AppData.pin) {
+                document.getElementById('loginScreen').style.display = 'none';
+                showToast('✅ Welcome back!');
+            } else {
+                document.getElementById('pinError').style.display = 'block';
+                // Clear inputs
+                document.getElementById('pin1').value = '';
+                document.getElementById('pin2').value = '';
+                document.getElementById('pin3').value = '';
+                document.getElementById('pin4').value = '';
+                document.getElementById('pin1').focus();
+                
+                setTimeout(() => {
+                    document.getElementById('pinError').style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        function togglePasswordProtection(element) {
+            const isActive = element.classList.toggle('active');
+            AppData.settings.passwordProtection = isActive;
+            AppData.save();
+            
+            if (isActive) {
+                showToast('🔐 Password protection enabled. Default PIN: 1234');
+            } else {
+                showToast('🔓 Password protection disabled');
+            }
+        }
+
+        // ==================== RECURRING APPOINTMENTS ====================
+        function toggleRecurring() {
+            const checkbox = document.getElementById('recurringCheck');
+            const options = document.getElementById('recurringOptions');
+            
+            if (checkbox.checked) {
+                options.classList.add('active');
+                showToast('🔄 Recurring appointment enabled');
+            } else {
+                options.classList.remove('active');
+            }
+        }
+
+        // ==================== PATIENT PROFILES ====================
+        function viewPatientProfile(name, initials, color) {
+            document.getElementById('patientListCard').style.display = 'none';
+            document.getElementById('patientProfile').style.display = 'block';
+            
+            // Update profile data
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileAvatar').textContent = initials;
+            document.getElementById('profileAvatar').style.background = color;
+            
+            showToast(`📋 Viewing ${name}'s profile`);
+        }
+
+        function closePatientProfile() {
+            document.getElementById('patientListCard').style.display = 'block';
+            document.getElementById('patientProfile').style.display = 'none';
+        }
+
+        // ==================== DRAG AND DROP RESCHEDULING ====================
+        let draggedElement = null;
+
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.classList.contains('draggable')) {
+                draggedElement = e.target;
+                e.target.style.opacity = '0.5';
+                showToast('↔️ Drag to reschedule appointment');
+            }
+        });
+
+        document.addEventListener('dragend', (e) => {
+            if (e.target.classList.contains('draggable')) {
+                e.target.style.opacity = '1';
+            }
+        });
+
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (draggedElement && e.target.classList.contains('time-slot') && !e.target.classList.contains('booked')) {
+                showToast('✅ Appointment rescheduled!');
+            }
+        });
+
+        // ==================== BLOCK TIME SLOTS ====================
+        function blockTimeSlot() {
+            showToast('🚫 Click a time slot to block it');
+            
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.style.cursor = 'pointer';
+                slot.addEventListener('click', function blockHandler() {
+                    if (!this.classList.contains('booked') && !this.classList.contains('blocked-slot')) {
+                        this.classList.add('blocked-slot');
+                        this.setAttribute('title', 'Blocked');
+                        showToast(`🚫 ${this.textContent} blocked`);
+                    } else if (this.classList.contains('blocked-slot')) {
+                        this.classList.remove('blocked-slot');
+                        this.removeAttribute('title');
+                        showToast(`✅ ${this.textContent} unblocked`);
+                    }
+                    this.removeEventListener('click', blockHandler);
+                });
+            });
+        }
+
+        // ==================== QR CODE CHECK-IN ====================
+        function showQRCode() {
+            document.getElementById('qrModal').classList.add('active');
+            showToast('📱 QR Code displayed');
+        }
+
+        function closeQRCode() {
+            document.getElementById('qrModal').classList.remove('active');
+        }
+
+        function downloadQRCode() {
+            showToast('📥 QR Code downloaded!');
+            // In real implementation, this would generate and download actual QR code
+        }
+
+        // ==================== SMS/EMAIL TEMPLATES ====================
+        function openTemplates() {
+            document.getElementById('templatesModal').classList.add('active');
+        }
+
+        function closeTemplates() {
+            document.getElementById('templatesModal').classList.remove('active');
+        }
+
+        // ==================== PDF EXPORT ====================
+        function exportScheduleToPDF() {
+            showToast('📄 Generating PDF report...');
+            
+            setTimeout(() => {
+                // Simulate PDF generation
+                const pdfData = {
+                    title: 'MediSchedule AI - Daily Report',
+                    date: 'February 6, 2026',
+                    appointments: [
+                        { time: '9:00 AM', patient: 'Sarah Johnson', type: 'General Checkup', payment: 'Paid $150' },
+                        { time: '10:00 AM', patient: 'Michael Chen', type: 'Follow-up Visit', payment: 'Unpaid $100' },
+                        { time: '11:30 AM', patient: 'Emma Williams', type: 'Lab Results Review', payment: 'Partial $75' },
+                        { time: '2:00 PM', patient: 'David Martinez', type: 'Annual Physical', payment: 'Paid $250' }
+                    ],
+                    totalRevenue: '$475',
+                    outstanding: '$125'
+                };
+                
+                showToast('✅ PDF report ready!');
+                console.log('PDF Data:', pdfData);
+            }, 1500);
+        }
+
+        // ==================== GOOGLE CALENDAR SYNC ====================
+        function syncWithGoogleCalendar() {
+            if (!AppData.settings.googleSync) return;
+            
+            showToast('🌐 Syncing with Google Calendar...');
+            
+            setTimeout(() => {
+                showToast('✅ Calendar synced successfully!');
+            }, 2000);
+        }
+
+        // ==================== DARK MODE ====================
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            
+            if (isDark) {
+                html.removeAttribute('data-theme');
+                AppData.settings.darkMode = false;
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                AppData.settings.darkMode = true;
+            }
+
+            // Update toggle in settings
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.classList.toggle('active');
+            }
+
+            AppData.save();
+            showToast(isDark ? '☀️ Light mode activated' : '🌙 Dark mode activated');
+        }
+
+        // ==================== SETTINGS MODAL ====================
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+            AppData.save();
+        }
+
+        function toggleSetting(element) {
+            element.classList.toggle('active');
+            const setting = element.getAttribute('data-setting');
+            AppData.settings[setting] = element.classList.contains('active');
+            
+            // Show conflict warning if enabled
+            if (setting === 'conflictDetection' && AppData.settings[setting]) {
+                setTimeout(() => {
+                    const warning = document.getElementById('conflictWarning');
+                    if (warning) warning.style.display = 'flex';
+                }, 500);
+            }
+
+            // Sync with Google Calendar if enabled
+            if (setting === 'googleSync' && AppData.settings[setting]) {
+                syncWithGoogleCalendar();
+            }
+        }
+
+        // ==================== SEARCH FUNCTIONALITY ====================
+        function searchPatients() {
+            const searchTerm = document.getElementById('patientSearch').value.toLowerCase();
+            const patientList = document.getElementById('patientList');
+            const patients = patientList.querySelectorAll('.patient-item');
+            const noResults = document.getElementById('noResults');
+            let visibleCount = 0;
+
+            patients.forEach(patient => {
+                const name = patient.getAttribute('data-name');
+                if (name.includes(searchTerm)) {
+                    patient.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    patient.style.display = 'none';
+                }
+            });
+
+            // Show/hide no results message
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResults.style.display = 'block';
+                patientList.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                patientList.style.display = 'block';
+            }
+        }
+
+        // ==================== EXPORT FUNCTIONALITY ====================
+        function exportSchedule() {
+            const scheduleData = {
+                date: 'February 6, 2026',
+                appointments: [
+                    { time: '9:00 AM', patient: 'Sarah Johnson', type: 'General Checkup', duration: '30 min', status: 'Confirmed', payment: 'Paid $150' },
+                    { time: '10:00 AM', patient: 'Michael Chen', type: 'Follow-up Visit', duration: '20 min', status: 'Confirmed', payment: 'Unpaid $100' },
+                    { time: '11:30 AM', patient: 'Emma Williams', type: 'Lab Results Review', duration: '15 min', status: 'Pending', payment: 'Partial $75' },
+                    { time: '2:00 PM', patient: 'David Martinez', type: 'Annual Physical', duration: '45 min', status: 'AI Scheduled', payment: 'Paid $250' }
+                ]
+            };
+
+            // Create CSV content
+            let csv = 'Time,Patient,Type,Duration,Status,Payment\n';
+            scheduleData.appointments.forEach(apt => {
+                csv += `"${apt.time}","${apt.patient}","${apt.type}","${apt.duration}","${apt.status}","${apt.payment}"\n`;
+            });
+
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `schedule-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            showToast('📤 Schedule exported to CSV successfully!');
+            
+            // Also offer PDF export
+            setTimeout(() => {
+                if (confirm('Would you also like to export as PDF?')) {
+                    exportScheduleToPDF();
+                }
+            }, 1000);
+        }
+
+        // ==================== PRINT FUNCTIONALITY ====================
+        function printSchedule() {
+            window.print();
+            showToast('🖨️ Print dialog opened');
+        }
+
+        // ==================== TOAST NOTIFICATIONS ====================
+        function showToast(message, duration = 2000) {
+            // Remove existing toast
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, duration);
+        }
+
+        // ==================== AI CONFLICT DETECTION ====================
+        function detectConflicts() {
+            if (!AppData.settings.conflictDetection) return;
+
+            // Simulate AI conflict detection
+            const conflicts = [
+                'Potential overlap: 2:30 PM appointment may run into 3:00 PM slot',
+                'Low buffer time between 10:00 AM and 11:30 AM appointments',
+                'Patient Emma Williams has unconfirmed appointment'
+            ];
+
+            const randomConflict = conflicts[Math.floor(Math.random() * conflicts.length)];
+            const warning = document.getElementById('conflictWarning');
+            if (warning) {
+                warning.textContent = '⚠️ AI detected: ' + randomConflict;
+                warning.style.display = 'flex';
+                
+                // Hide after 10 seconds
+                setTimeout(() => {
+                    warning.style.display = 'none';
+                }, 10000);
+            }
+        }
+
+        // ==================== AUTO-REMINDERS ====================
+        function sendAutoReminders() {
+            if (!AppData.settings.reminders) return;
+
+            // Simulate sending reminders
+            setTimeout(() => {
+                showToast('📱 Auto-reminders sent to 3 patients', 3000);
+            }, 5000);
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Highlight active nav tab
+            event.target.classList.add('active');
+
+            // Update bottom nav
+            document.querySelectorAll('.bottom-nav-item').forEach((item, index) => {
+                item.classList.remove('active');
+            });
+            const tabIndex = ['schedule', 'book', 'patients', 'analytics'].indexOf(tabName);
+            document.querySelectorAll('.bottom-nav-item')[tabIndex].classList.add('active');
+        }
+
+        // Calendar Generation
+        let currentMonth = 1; // February (0-indexed)
+        let currentYear = 2026;
+
+        function generateCalendar() {
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const calendarDates = document.getElementById('calendarDates');
+            calendarDates.innerHTML = '';
+
+            // Empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                calendarDates.appendChild(emptyCell);
+            }
+
+            // Generate days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateCell = document.createElement('div');
+                dateCell.className = 'calendar-date';
+                dateCell.textContent = day;
+                
+                // Mark today
+                if (day === 6 && currentMonth === 1 && currentYear === 2026) {
+                    dateCell.classList.add('today');
+                }
+
+                // Mark days with appointments
+                if ([6, 8, 10, 13, 15, 20, 22, 27].includes(day)) {
+                    dateCell.classList.add('has-appointments');
+                }
+
+                dateCell.onclick = () => selectDate(day);
+                calendarDates.appendChild(dateCell);
+            }
+
+            updateMonthDisplay();
+        }
+
+        function updateMonthDisplay() {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentMonth').textContent = `${months[currentMonth]} ${currentYear}`;
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar();
+        }
+
+        function selectDate(day) {
+            document.querySelectorAll('.calendar-date').forEach(cell => {
+                if (cell.textContent == day && !cell.classList.contains('today')) {
+                    cell.style.background = 'var(--background)';
+                    cell.style.fontWeight = '600';
+                }
+            });
+        }
+
+        // Time Slot Selection
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('time-slot') && !e.target.classList.contains('booked')) {
+                document.querySelectorAll('.time-slot').forEach(slot => {
+                    slot.classList.remove('selected');
+                });
+                e.target.classList.add('selected');
+            }
+        });
+
+        // Update time slots based on appointment type
+        function updateTimeSlots() {
+            const slots = document.getElementById('timeSlots');
+            const times = ['9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', 
+                          '11:30 AM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', 
+                          '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM'];
+            
+            slots.innerHTML = '';
+            times.forEach((time, index) => {
+                const slot = document.createElement('div');
+                slot.className = 'time-slot';
+                slot.textContent = time;
+                
+                // Randomly mark some as booked
+                if ([2, 6, 9].includes(index)) {
+                    slot.classList.add('booked');
+                }
+                
+                slots.appendChild(slot);
+            });
+        }
+
+        // Form Submission
+        document.getElementById('bookingForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const isRecurring = document.getElementById('recurringCheck').checked;
+            
+            // Show toast
+            if (isRecurring) {
+                showToast('✓ Recurring appointments booked successfully! 🔄');
+            } else {
+                showToast('✓ Appointment booked successfully!');
+            }
+            
+            setTimeout(() => {
+                switchTab('schedule');
+                document.getElementById('bookingForm').reset();
+                document.getElementById('recurringOptions').classList.remove('active');
+                
+                // Send confirmation if enabled
+                if (AppData.settings.emailConfirm) {
+                    setTimeout(() => {
+                        showToast('📧 Confirmation email sent!', 2500);
+                    }, 1000);
+                }
+
+                // Sync with Google Calendar if enabled
+                if (AppData.settings.googleSync) {
+                    setTimeout(() => {
+                        showToast('🌐 Synced to Google Calendar', 3000);
+                    }, 2000);
+                }
+            }, 2000);
+        });
+
+        // Bottom Navigation
+        document.querySelectorAll('.bottom-nav-item').forEach((item, index) => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabs = ['schedule', 'book', 'patients', 'analytics'];
+                switchTab(tabs[index]);
+            });
+        });
+
+        // Simple Chart Drawing
+        function drawChart() {
+            const canvas = document.getElementById('weeklyChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Data
+            const data = [42, 38, 45, 52, 48, 55, 40];
+            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const max = Math.max(...data);
+            
+            // Draw bars
+            const barWidth = width / data.length - 10;
+            const padding = 40;
+            
+            data.forEach((value, index) => {
+                const barHeight = (value / max) * (height - padding);
+                const x = index * (barWidth + 10) + 5;
+                const y = height - barHeight - 20;
+                
+                // Gradient
+                const gradient = ctx.createLinearGradient(0, y, 0, height - 20);
+                gradient.addColorStop(0, '#0066CC');
+                gradient.addColorStop(1, '#00C9A7');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                // Labels
+                ctx.fillStyle = '#5F6368';
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(labels[index], x + barWidth / 2, height - 5);
+                ctx.fillText(value, x + barWidth / 2, y - 5);
+            });
+        }
+
+        // Close modal when clicking overlay
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                if (e.target.id === 'settingsModal') {
+                    closeSettings();
+                } else if (e.target.id === 'qrModal') {
+                    closeQRCode();
+                } else if (e.target.id === 'templatesModal') {
+                    closeTemplates();
+                }
+            }
+        });
+
+        // ==================== INITIALIZATION ====================
+        // Initialize app
+        AppData.init();
+        generateCalendar();
+        setTimeout(drawChart, 100);
+
+        // Run AI features
+        setTimeout(detectConflicts, 3000);
+        sendAutoReminders();
+
+        // Auto-save periodically
+        if (AppData.settings.offline) {
+            setInterval(() => {
+                AppData.save();
+            }, 30000); // Save every 30 seconds
+        }
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Welcome message
+        setTimeout(() => {
+            showToast('👋 Welcome to MediSchedule AI!', 3000);
+        }, 1000);
+    </script>
+</body>
+</html>
